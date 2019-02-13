@@ -1,4 +1,4 @@
-#Import maya.cmds and abrevaite them to "mc".
+#Import maya.cmds and abrevaite them to "cmds".
 import maya.cmds as cmds
 #Import math
 from math import pow,sqrt
