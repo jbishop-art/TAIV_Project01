@@ -12,12 +12,20 @@ GLOBAL VARS
 '''
 # vars for camera translate sliders
 camTransXSlider = None
-#, camTransYSlider, camTransZSlider =
+
+# bool for checkbox, camera always look at origin.
+camLookAt = None
 
 # vars for camera location
 camTransX = 0
 camTransY = 0
 camTransZ = 0
+
+# var for camera FOV
+camFOV = 20
+
+
+
 
 '''
 *********************************************************************
@@ -39,35 +47,57 @@ def windowCamera():
 
     # blank space for ui elements
     cmds.text(label="")
+    
+    # checkbox for camera to always look at origin
+    cmds.text(label="Camera Always Face Origin (Resets Camera):")
+    cmds.checkBox("cameraLookAtBool", label='', onc=cameraLookAtCB, ofc=cameraLookAtCB)
+    
+    # blank space for ui elements
+    cmds.text(label="")
 
     # slider for translation of camera
     ### X
     cmds.text(label="Camera Location X: ")
+    cmds.text("transXLabel", label=camTransX)
     camTransXSlider = cmds.intSlider("camTransXSlider", min=-1000, max=1000, value=0, step=1, dc=queryCameraSliders)
     # blank space for ui elements
     cmds.text(label="")
 
     ### Y
     cmds.text(label="Camera Location Y: ")
+    cmds.text("transYLabel", label=camTransY)
     camTransYSlider = cmds.intSlider("camTransYSlider", min=-1000, max=1000, value=0, step=1, dc=queryCameraSliders)
     # blank space for ui elements
     cmds.text(label="")
 
     ### Z
     cmds.text(label="Camera Location Z: ")
+    cmds.text("transZLabel", label=camTransZ)
     camTransZSlider = cmds.intSlider("camTransZSlider", min=-1000, max=1000, value=5, step=1, dc=queryCameraSliders)
 
     # blank space for ui elements
     cmds.text(label="")
-
-
+    
+    # Slider to control FOV
+    cmds.text(label="FOV")
+    cmds.text("fovLabel",label=camFOV)
+    camFOVSlider = cmds.intSlider("camFOVSlider", min=5, max=120, value=20, step=1, dc=queryFOV)
+    
+    # blank space for ui elements
+    cmds.text(label="")
 
     # create camera
     cmds.camera(n="camera_01", p=[cmds.intSlider(camTransXSlider, q=True, v=True), cmds.intSlider(camTransYSlider, q=True, v=True), cmds.intSlider(camTransZSlider, q=True, v=True)])
     cmds.lookThru("camera_01")
+    
+    #Line of text lines
+    cmds.text(label="__________________________________")
+    
+    # blank space for ui elements
+    cmds.text(label="")
 
     # button to render
-    cmds.button(label='Step #2: Render', command=render, bgc=[1,1,0])
+    cmds.button(label=' Step #2: Render ', command=render, bgc=[1,1,0])
 
     # blank space for ui elements
     cmds.text(label="")
@@ -78,20 +108,69 @@ def windowCamera():
     cmds.showWindow(window)
 
     return camTransXSlider, camTransYSlider, camTransZSlider
+    
+# Update FOV of Camera
+def queryFOV(*args):
+    camFOV = cmds.intSlider("camFOVSlider", q=True, v=True)
+    cmds.viewPlace( "camera_01", fov=camFOV)  
+    
+    #update text value for fov slider
+    cmds.text("fovLabel", e=True, label=camFOV)      
+
+
+# Always face camera checkbox
+def cameraLookAtCB(*args):
+    camLookAt = cmds.checkBox("cameraLookAtBool", q=True, v=True)
+   
+    if camLookAt == True:
+        #reset Camera
+        cmds.viewPlace( "camera_01", vd=(0,0,-2), fov=20)
+        #reset sliders for translations
+        cmds.intSlider("camTransXSlider", e=True, v=0)
+        cmds.intSlider("camTransYSlider", e=True, v=0)
+        cmds.intSlider("camTransZSlider", e=True, v=0)
+         
+        #Camera always look at origin.
+        cmds.viewPlace( "camera_01", la=(0, 0, 0) )
+    else:
+        #reset sliders for translations
+        cmds.intSlider("camTransXSlider", e=True, v=0)
+        cmds.intSlider("camTransYSlider", e=True, v=0)
+        cmds.intSlider("camTransZSlider", e=True, v=0)
+        
+        #reset Camera
+        cmds.viewPlace( "camera_01", vd=(0,0,-2), fov=20)             
+         
 
 # Query slider values for camera location
 def queryCameraSliders(*args):
+    #set var for translates from camera slider translations settings.
     camTransX = cmds.intSlider("camTransXSlider", q=True, v=True)
     camTransY = cmds.intSlider("camTransYSlider", q=True, v=True)
     camTransZ = cmds.intSlider("camTransZSlider", q=True, v=True)
+    
 
     #Translate camera
-    cmds.move(camTransX*0.01, camTransY*0.01, camTransZ*0.01, "camera_01", absolute=True)
-
+    cmds.move(camTransX*0.02, camTransY*0.02, camTransZ*0.02, "camera_01", absolute=True)
+    
+    #check bool of always face origin for camera
+    camLookAt = cmds.checkBox("cameraLookAtBool", q=True, v=True)
+    if camLookAt == True:
+        cmds.viewPlace( "camera_01", la=(0, 0, 0) )
+        #updates off of cameraLookAtCB()
+        
+    #update text values of sliders
+    cmds.text("transXLabel", e=True, label=camTransX)
+    cmds.text("transYLabel", e=True, label=camTransY)
+    cmds.text("transZLabel", e=True, label=camTransZ)
+    
+    
+        
 # Delete Main Window
 def deleteMain(*args):
     cmds.deleteUI("MainWindow", window=True)
     windowCamera()
+
 
 # Create Main Window
 def windowMain(*args):
