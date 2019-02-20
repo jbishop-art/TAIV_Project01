@@ -36,14 +36,35 @@ camFOV = 20
 def render(*args):
     cmds.renderSettings(cam="camera_01")
     cmds.render(None)
+    
+# Create Lighting Setup Window
+def windowLighting():
+    #checks to see if window exists. if so, delete it.
+    if (cmds.window("LightingWindow", q=True, exists=True) == True):
+        cmds.deleteUI("LightingWindow", window=True)
+  
+    lightingWindow = cmds.window("LightingWindow", title="Lighting Setup", iconName='Lighting Setup', widthHeight=(400, 400), bgc=[0.5, 0.5, 0.5])
+    cmds.columnLayout(adjustableColumn=True)
+    
+    # blank space for ui elements
+    cmds.text(label="") 
+    
+       
+# Delete Camera Window
+def deleteCameraWnd(*args):
+    cmds.deleteUI("CameraWindow", window=True)
+    windowLighting()    
 
 
 # Create Camera Setup Window
 def windowCamera():
-
+    #checks to see if window exists. if so, delete it.
+    if (cmds.window("CameraWindow", q=True, exists=True) == True):
+        cmds.deleteUI("CameraWindow", window=True)
+        
     # make window
-    window = cmds.window(title="Camera Setup", iconName='Camera Setup', widthHeight=(400, 300), bgc=[0.2, 0.2, 0.2])
-    cmds.columnLayout(adjustableColumn=False)
+    window =cmds.window("CameraWindow", title="Camera Setup", iconName='Camera Setup', widthHeight=(400, 400), bgc=[0.2, 0.2, 0.2])
+    cmds.columnLayout(adjustableColumn=True)
 
     # blank space for ui elements
     cmds.text(label="")
@@ -89,15 +110,15 @@ def windowCamera():
     # create camera
     cmds.camera(n="camera_01", p=[cmds.intSlider(camTransXSlider, q=True, v=True), cmds.intSlider(camTransYSlider, q=True, v=True), cmds.intSlider(camTransZSlider, q=True, v=True)])
     cmds.lookThru("camera_01")
-    
+        
     #Line of text lines
     cmds.text(label="__________________________________")
     
     # blank space for ui elements
     cmds.text(label="")
 
-    # button to render
-    cmds.button(label=' Step #2: Render ', command=render, bgc=[1,1,0])
+    # button to move onto Lighting
+    cmds.button(label=' Step #2: Lighting ', command=deleteCameraWnd, bgc=[1,1,0])
 
     # blank space for ui elements
     cmds.text(label="")
@@ -163,7 +184,6 @@ def queryCameraSliders(*args):
     cmds.text("transXLabel", e=True, label=camTransX)
     cmds.text("transYLabel", e=True, label=camTransY)
     cmds.text("transZLabel", e=True, label=camTransZ)
-    
     
         
 # Delete Main Window
