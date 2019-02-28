@@ -24,6 +24,11 @@ camTransZ = 0
 # var for camera FOV
 camFOV = 20
 
+# vars for spot light location
+spotLightX = 0
+spotLightY = 0
+spotLightZ = 0
+
 
 
 
@@ -37,17 +42,118 @@ def render(*args):
     cmds.renderSettings(cam="camera_01")
     cmds.render(None)
     
+#create ambient light
+def createAmbientLight(*args):
+    # Create an ambientLight light
+    light = cmds.ambientLight(name="Ambient Light", intensity=0.8)
+
+    # Change the light intensity
+    cmds.ambientLight( light, e=True, intensity=0.5 )
+    
+#delete ambient light  
+def delAmbientLight(*args):
+    cmds.delete('Ambient_Light')
+    
+#create spot light
+def createSpotLight(*args): 
+    # Create a spot light
+    light = cmds.spotLight(coneAngle=45)
+    
+    # Change the cone angle value
+    cmds.spotLight( light, e=True, coneAngle=33 )
+    
+    # create locator
+    cmds.spaceLocator()
+    
+    # Point Spotlight at center
+    cmds.aimConstraint( 'locator1', 'spotLight1' ) 
+    
+#delete directional light
+def deleteSpotLight(*args):
+    # Delete directional Light
+    cmds.delete('spotLight1')
+    cmds.delete('locator1')
+    
+    
+# Query slider values for camera location
+def queryLightSliders(*args):
+    #set var for translates from spot light slider translations settings.
+    spotLightX = cmds.intSlider("spotLighSliderX", q=True, v=True)
+    spotLightY = cmds.intSlider("spotLighSliderY", q=True, v=True)
+    spotLightZ = cmds.intSlider("spotLighSliderZ", q=True, v=True)
+
+    #Translate spotLight
+    cmds.move(spotLightX*0.02, spotLightY*0.02, spotLightZ*0.02, "spotLight1", absolute=True)
+    
+    # Point Spotlight at center
+    cmds.aimConstraint( 'locator1', 'spotLight1' )
+    
+#delete lighting window
+def deleteLightingWindow(*args):
+    cmds.deleteUI("LightingWindow", window=True)    
+        
+    
 # Create Lighting Setup Window
-def windowLighting():
+def windowLighting(*args):
     #checks to see if window exists. if so, delete it.
     if (cmds.window("LightingWindow", q=True, exists=True) == True):
         cmds.deleteUI("LightingWindow", window=True)
   
-    lightingWindow = cmds.window("LightingWindow", title="Lighting Setup", iconName='Lighting Setup', widthHeight=(400, 400), bgc=[0.5, 0.5, 0.5])
-    cmds.columnLayout(adjustableColumn=True)
+    #create window      
+    lightWindow = cmds.window("LightingWindow", title="Lighting Setup", iconName='Lighting Setup', widthHeight=(400, 400), bgc=[0.2, 0.2, 0.0])
+    cmds.rowColumnLayout( numberOfColumns=2 )
     
     # blank space for ui elements
-    cmds.text(label="") 
+    cmds.text(label="")
+    cmds.text(label="")
+    
+    #ambient light checkbox
+    cmds.text(label="Ambient Light:", al="left")
+    cmds.checkBox("ambientLightBool", label='', onc=createAmbientLight, ofc=delAmbientLight)
+    
+    # blank space for ui elements
+    cmds.text(label="")
+    cmds.text(label="")
+        
+    #spotlight checkbox
+    cmds.text(label="Spot Light: ", al="left")
+    cmds.checkBox("spotLightBool", label='', onc=createSpotLight, ofc=deleteSpotLight) 
+    
+    # blank space for ui elements
+    cmds.text(label="")
+    cmds.text(label="")
+    
+    # slider for Spot Light X
+    cmds.text(label="Spotlight Pos X: ")
+    cmds.text("spotLightX")
+    camFOVSlider = cmds.intSlider("spotLighSliderX", min=-100, max=100, value=0, step=1, dc=queryLightSliders)
+    
+    # blank space for ui elements
+    cmds.text(label="")
+    
+    # slider for Spot Light Y
+    cmds.text(label="Spotlight Pos Y: ")
+    cmds.text("spotLightY")
+    camFOVSlider = cmds.intSlider("spotLighSliderY", min=-100, max=100, value=0, step=1, dc=queryLightSliders)
+    
+    # blank space for ui elements
+    cmds.text(label="")
+    
+    # slider for Spot Light Z
+    cmds.text(label="Spotlight Pos Z: ")
+    cmds.text("spotLightZ")
+    camFOVSlider = cmds.intSlider("spotLighSliderZ", min=-100, max=100, value=0, step=1, dc=queryLightSliders)
+    
+    # blank space for ui elements
+    cmds.text(label="")
+    
+    
+    # button to close the current window
+    cmds.button(label='Close', command=deleteLightingWindow, bgc=[1,0,0])
+    cmds.setParent('..')
+    
+    #Force show window
+    cmds.showWindow(lightWindow)
     
        
 # Delete Camera Window
@@ -118,7 +224,7 @@ def windowCamera():
     cmds.text(label="")
 
     # button to move onto Lighting
-    cmds.button(label=' Step #2: Lighting ', command=deleteCameraWnd, bgc=[1,1,0])
+    cmds.button(label=' Step #2: Lighting ', command=deleteCameraWnd, bgc=[0,1,0])
 
     # blank space for ui elements
     cmds.text(label="")
@@ -126,6 +232,8 @@ def windowCamera():
     # button to close the current window
     cmds.button(label='Close', command=('cmds.deleteUI(\"' + window + '\", window=True)'), bgc=[1,0,0])
     cmds.setParent('..')
+    
+    #Force show window
     cmds.showWindow(window)
 
     return camTransXSlider, camTransYSlider, camTransZSlider
@@ -186,25 +294,43 @@ def queryCameraSliders(*args):
     cmds.text("transZLabel", e=True, label=camTransZ)
     
         
-# Delete Main Window
+# Delete Main Window for open camera window
 def deleteMain(*args):
     cmds.deleteUI("MainWindow", window=True)
     windowCamera()
+    
+# Delete Main Window for close
+def deleteMainWindow(*args):
+    cmds.deleteUI("MainWindow", window=True)
 
 
 # Create Main Window
 def windowMain(*args):
+    #checks to see if window exists. if so, delete it.
+    if (cmds.window("MainWindow", q=True, exists=True) == True):
+        cmds.deleteUI("MainWindow", window=True)
+    
     # create Main Window
-    mainWindow = cmds.window("MainWindow", title="Main Window", iconName='Main', widthHeight=(400, 200), bgc=[0,0,0])
-    cmds.columnLayout(adjustableColumn=False)
+    mainWindow = cmds.window("MainWindow", title="Main Window", iconName='Main', widthHeight=(500, 100), bgc=[0,0,0], sizeable=True)
+    cmds.rowColumnLayout( numberOfRows=5 )
+                                               
+    #text to describe tool
+    cmds.text(label="Auto Render Sprite Sheet Tool", bgc=[0.5,0.5,0.5]) 
+    
+    # text body
+    cmds.text(label="This tool will automate setting up a camera and allow user refinemnet of view. Then a lighting setup will be created based on the users selction.  Lastly, Once render is hit, Maya will render the scene then spit out a sprite sheet.", ww=True)
 
+    #spacer
+    cmds.text(label="")     
+     
     # make button to open Camera Setup Window.
-    cmds.button(label='Camera Setup', command=deleteMain)
-
-    # blank space for ui elements
-    cmds.text(label="")
-
+    cmds.button(label='Step #1: Camera Setup', align='center', bgc=[0,1,0], command=deleteMain)
+   
+    # button to close the current window
+    cmds.button(label='Close', command=deleteMainWindow, bgc=[1,0,0])
     cmds.setParent('..')
+    
+    #Force show window
     cmds.showWindow(mainWindow)
 
 '''
