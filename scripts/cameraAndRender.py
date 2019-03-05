@@ -29,20 +29,16 @@ spotLightX = 0
 spotLightY = 0
 spotLightZ = 0
 
-
-
-
 '''
 *********************************************************************
 '''
-
 
 # Render
 def render(*args):
     cmds.renderSettings(cam="camera_01")
     cmds.render(None)
     
-#create ambient light
+# create ambient light
 def createAmbientLight(*args):
     # Create an ambientLight light
     light = cmds.ambientLight(name="Ambient Light", intensity=0.8)
@@ -50,121 +46,126 @@ def createAmbientLight(*args):
     # Change the light intensity
     cmds.ambientLight( light, e=True, intensity=0.5 )
     
-#delete ambient light  
+# delete ambient light
 def delAmbientLight(*args):
     cmds.delete('Ambient_Light')
     
-#create spot light
-def createSpotLight(*args): 
+# create spot light
+def createSpotLight(*args):
+    # create group to hold spot light structure
+    #cmds.group(n='Group_Spotlight')
+
     # Create a spot light
-    light = cmds.spotLight(coneAngle=45)
+    light = cmds.spotLight(n='spotlight_01', coneAngle=45)
     
     # Change the cone angle value
     cmds.spotLight( light, e=True, coneAngle=33 )
+
+    # create camera to tie spot light to
+    cmds.camera(n='spotlightAnchor_01')
+
+    # contrain spotlight to camera anchor
+    cmds.parent('spotlight_01', 'spotlightAnchor_01')
+
+    # set spotlight anchor intial location
+    cmds.viewPlace("camera_01", vd=(0, 0, -2), fov=20)
     
-    # create locator
-    cmds.spaceLocator()
-    
-    # Point Spotlight at center
-    cmds.aimConstraint( 'locator1', 'spotLight1' ) 
-    
-#delete directional light
+# delete spot light
 def deleteSpotLight(*args):
     # Delete directional Light
-    cmds.delete('spotLight1')
-    cmds.delete('locator1')
+    cmds.delete('spotlight_01')
+    cmds.delete('spotlightAnchor_01')
     
-    
-# Query slider values for camera location
-def queryLightSliders(*args):
-    #set var for translates from spot light slider translations settings.
+# Query slider values for spot light location
+def querySpotLightSliders(*args):
+    # set var for translates from spotlight Anchor slider translations settings.
     spotLightX = cmds.intSlider("spotLighSliderX", q=True, v=True)
     spotLightY = cmds.intSlider("spotLighSliderY", q=True, v=True)
     spotLightZ = cmds.intSlider("spotLighSliderZ", q=True, v=True)
 
-    #Translate spotLight
-    cmds.move(spotLightX*0.02, spotLightY*0.02, spotLightZ*0.02, "spotLight1", absolute=True)
+    # Translate spotLight anchor
+    cmds.move(spotLightX*0.02, spotLightY*0.02, spotLightZ*0.02, "spotlightAnchor_01", absolute=True)
+
+    # always have spotlight anchor look at center
+    cmds.viewPlace('spotlightAnchor_01', la=(0,0,0))
+
     
-    # Point Spotlight at center
-    cmds.aimConstraint( 'locator1', 'spotLight1' )
-    
-#delete lighting window
+# delete lighting window
 def deleteLightingWindow(*args):
-    cmds.deleteUI("LightingWindow", window=True)    
-        
+    cmds.deleteUI("LightingWindow", window=True)
     
 # Create Lighting Setup Window
 def windowLighting(*args):
-    #checks to see if window exists. if so, delete it.
+    # checks to see if window exists. if so, delete it.
     if (cmds.window("LightingWindow", q=True, exists=True) == True):
         cmds.deleteUI("LightingWindow", window=True)
-  
-    #create window      
+
+    # create window
     lightWindow = cmds.window("LightingWindow", title="Lighting Setup", iconName='Lighting Setup', widthHeight=(400, 400), bgc=[0.2, 0.2, 0.0])
     cmds.rowColumnLayout( numberOfColumns=2 )
-    
+
     # blank space for ui elements
     cmds.text(label="")
     cmds.text(label="")
-    
-    #ambient light checkbox
+
+    # ambient light checkbox
     cmds.text(label="Ambient Light:", al="left")
     cmds.checkBox("ambientLightBool", label='', onc=createAmbientLight, ofc=delAmbientLight)
-    
+
     # blank space for ui elements
     cmds.text(label="")
     cmds.text(label="")
-        
-    #spotlight checkbox
+
+    # spotlight checkbox
     cmds.text(label="Spot Light: ", al="left")
-    cmds.checkBox("spotLightBool", label='', onc=createSpotLight, ofc=deleteSpotLight) 
-    
+    cmds.checkBox("spotLightBool", label='', onc=createSpotLight, ofc=deleteSpotLight)
+
     # blank space for ui elements
     cmds.text(label="")
     cmds.text(label="")
-    
+
     # slider for Spot Light X
     cmds.text(label="Spotlight Pos X: ")
     cmds.text("spotLightX")
-    camFOVSlider = cmds.intSlider("spotLighSliderX", min=-100, max=100, value=0, step=1, dc=queryLightSliders)
-    
+    camFOVSlider = cmds.intSlider("spotLighSliderX", min=-1000, max=1000, value=0, step=1, dc=querySpotLightSliders)
+
     # blank space for ui elements
     cmds.text(label="")
-    
+
     # slider for Spot Light Y
     cmds.text(label="Spotlight Pos Y: ")
     cmds.text("spotLightY")
-    camFOVSlider = cmds.intSlider("spotLighSliderY", min=-100, max=100, value=0, step=1, dc=queryLightSliders)
-    
+    camFOVSlider = cmds.intSlider("spotLighSliderY", min=-1000, max=1000, value=0, step=1, dc=querySpotLightSliders)
+
     # blank space for ui elements
     cmds.text(label="")
-    
+
     # slider for Spot Light Z
     cmds.text(label="Spotlight Pos Z: ")
     cmds.text("spotLightZ")
-    camFOVSlider = cmds.intSlider("spotLighSliderZ", min=-100, max=100, value=0, step=1, dc=queryLightSliders)
-    
+    camFOVSlider = cmds.intSlider("spotLighSliderZ", min=-1000, max=1000, value=0, step=1, dc=querySpotLightSliders)
+
     # blank space for ui elements
     cmds.text(label="")
-    
-    
+
+    # blank space for ui elements
+    cmds.text(label="")
+
     # button to close the current window
     cmds.button(label='Close', command=deleteLightingWindow, bgc=[1,0,0])
     cmds.setParent('..')
-    
-    #Force show window
+
+    # Force show window
     cmds.showWindow(lightWindow)
-    
-       
+
 # Delete Camera Window
 def deleteCameraWnd(*args):
     cmds.deleteUI("CameraWindow", window=True)
-    windowLighting()    
-
+    windowLighting()
 
 # Create Camera Setup Window
 def windowCamera():
-    #checks to see if window exists. if so, delete it.
+    # checks to see if window exists. if so, delete it.
     if (cmds.window("CameraWindow", q=True, exists=True) == True):
         cmds.deleteUI("CameraWindow", window=True)
         
@@ -244,8 +245,7 @@ def queryFOV(*args):
     cmds.viewPlace( "camera_01", fov=camFOV)  
     
     #update text value for fov slider
-    cmds.text("fovLabel", e=True, label=camFOV)      
-
+    cmds.text("fovLabel", e=True, label=camFOV)
 
 # Always face camera checkbox
 def cameraLookAtCB(*args):
@@ -268,8 +268,7 @@ def cameraLookAtCB(*args):
         cmds.intSlider("camTransZSlider", e=True, v=0)
         
         #reset Camera
-        cmds.viewPlace( "camera_01", vd=(0,0,-2), fov=20)             
-         
+        cmds.viewPlace( "camera_01", vd=(0,0,-2), fov=20)
 
 # Query slider values for camera location
 def queryCameraSliders(*args):
@@ -277,7 +276,6 @@ def queryCameraSliders(*args):
     camTransX = cmds.intSlider("camTransXSlider", q=True, v=True)
     camTransY = cmds.intSlider("camTransYSlider", q=True, v=True)
     camTransZ = cmds.intSlider("camTransZSlider", q=True, v=True)
-    
 
     #Translate camera
     cmds.move(camTransX*0.02, camTransY*0.02, camTransZ*0.02, "camera_01", absolute=True)
@@ -292,7 +290,6 @@ def queryCameraSliders(*args):
     cmds.text("transXLabel", e=True, label=camTransX)
     cmds.text("transYLabel", e=True, label=camTransY)
     cmds.text("transZLabel", e=True, label=camTransZ)
-    
         
 # Delete Main Window for open camera window
 def deleteMain(*args):
@@ -302,7 +299,6 @@ def deleteMain(*args):
 # Delete Main Window for close
 def deleteMainWindow(*args):
     cmds.deleteUI("MainWindow", window=True)
-
 
 # Create Main Window
 def windowMain(*args):
