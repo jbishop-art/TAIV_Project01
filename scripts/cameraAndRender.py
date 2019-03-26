@@ -478,7 +478,7 @@ def windowLighting(*args):
     #________________________RENDER WINDOW BUTTON__________________________________________
     
     # button to close the current window and open the Render Settings Window.
-    cmds.button(label="Render Window", command=openRenderWnd, bgc=[0,1,0])
+    cmds.button(label="Step #3: Rendering", command=openRenderWnd, bgc=[0,1,0])
     # blank space for ui elements
     cmds.text(label="")   
     
