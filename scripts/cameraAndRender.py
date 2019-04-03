@@ -78,7 +78,7 @@ def windowRender(*args):
         cmds.deleteUI("RenderWindow", window=True)     
 
     # create window
-    renderWindow = cmds.window("RenderWindow", title="Render Setup", iconName='Render Setup', bgc=[0.0, 0.1, 0.1], rtf=True, sizeable=False)
+    renderWindow = cmds.window("RenderWindow", title="Render Setup", iconName='Render Setup', bgc=[0.0, 0.1, 0.1], sizeable=False)
     cmds.rowColumnLayout( numberOfColumns=2 )
 
     # blank space for ui elements
@@ -94,11 +94,30 @@ def windowRender(*args):
     # blank space for ui elements
     cmds.text(label="")
     
+    # blank space for ui elements
+    cmds.text(label="")
+    cmds.text(label="")
+    
     #____________________________RENDER_____________________________________________
     
     # button to Render the current scene
     cmds.button(label='RENDER', bgc=[0,1,0])
     # blank space for ui elements
+    cmds.text(label="")
+    
+    #_______________________GO BACK BUTTON________________________________________________
+    
+    # blank space for ui elements
+    cmds.text(label="")
+    cmds.text(label="")
+    
+    # button go back to previous window
+    cmds.button(label=' Go Back. ', bgc=[1,1,1])
+    # blank space for ui elements
+    cmds.text(label="") 
+    
+    # blank space for ui elements
+    cmds.text(label="")
     cmds.text(label="")
     
     #_________________________CLOSE BUTTON__________________________________________________
@@ -109,6 +128,9 @@ def windowRender(*args):
     
     # Force show window
     cmds.showWindow(renderWindow)
+    
+    # Force resize the window
+    cmds.window( renderWindow, edit=True, widthHeight=(900, 777), tlc=[0,0] )
 
 # create ambient light
 def createAmbientLight(*args):
@@ -480,7 +502,22 @@ def windowLighting(*args):
     # button to close the current window and open the Render Settings Window.
     cmds.button(label="Step #3: Rendering", command=openRenderWnd, bgc=[0,1,0])
     # blank space for ui elements
-    cmds.text(label="")   
+    cmds.text(label="")  
+    
+    #_______________________GO BACK BUTTON________________________________________________
+    
+    # blank space for ui elements
+    cmds.text(label="")
+    cmds.text(label="")
+    
+    # button go back to previous window
+    cmds.button(label=' Go Back. ', bgc=[1,1,1])
+    # blank space for ui elements
+    cmds.text(label="") 
+    
+    # blank space for ui elements
+    cmds.text(label="")
+    cmds.text(label="")
     
     #_________________________CLOSE BUTTON__________________________________________________
 
@@ -490,6 +527,9 @@ def windowLighting(*args):
     
     # Force show window
     cmds.showWindow(lightWindow)
+    
+    # Force resize the window
+    cmds.window( lightWindow, edit=True, widthHeight=(175, 985), tlc=[0,0] )
 
 # Delete Camera Window
 def deleteCameraWnd(*args):
@@ -503,7 +543,7 @@ def windowCamera():
         cmds.deleteUI("CameraWindow", window=True)
         
     # make window
-    window =cmds.window("CameraWindow", title="Camera Setup", iconName='Camera Setup', bgc=[0.2, 0.2, 0.2], wh=(100,50), sizeable=True)
+    camWindow =cmds.window("CameraWindow", title="Camera Setup", iconName='Camera Setup', bgc=[0.2, 0.2, 0.2], sizeable=True)
     #cmds.columnLayout(adjustableColumn=True)
     cmds.rowColumnLayout( numberOfColumns=2 )
     
@@ -603,13 +643,25 @@ def windowCamera():
     # blank space for ui elements
     cmds.text(label="")
     cmds.text(label="")
+    
+    # button go back to previous window
+    cmds.button(label=' Go Back. ', bgc=[1,1,1])
+    # blank space for ui elements
+    cmds.text(label="")
+    
+    # blank space for ui elements
+    cmds.text(label="")
+    cmds.text(label="")
 
     # button to close the current window
-    cmds.button(label='Close', command=('cmds.deleteUI(\"' + window + '\", window=True)'), bgc=[1,0,0])
+    cmds.button(label='Close', command=('cmds.deleteUI(\"' + camWindow + '\", window=True)'), bgc=[1,0,0])
     cmds.setParent('..')
     
     #Force show window
-    cmds.showWindow(window)
+    cmds.showWindow(camWindow)
+    
+    # Force resize the window
+    cmds.window( camWindow, edit=True, widthHeight=(250, 405), tlc=[0,0] )
 
     return camTransXSlider, camTransYSlider, camTransZSlider
     
@@ -702,6 +754,9 @@ def windowMain(*args):
     
     #Force show window
     cmds.showWindow(mainWindow)
+    
+    # Force resize the window
+    cmds.window( mainWindow, edit=True, widthHeight=(240, 150), tlc=[0,0] )
 
 '''
 *********************************************************************
