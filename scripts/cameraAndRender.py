@@ -2,6 +2,9 @@
 import maya.cmds as cmds
 from functools import partial
 
+# Import functionality to use Mel specific commands within Python.
+import maya.mel as mel
+
 # Import math
 from math import pow,sqrt
 
@@ -67,10 +70,30 @@ dirLColB = 0
 *********************************************************************
 '''
 
+# render based on current render settings
+def renderGo(*args):
+    cmds.render()
+
+# open render settings window.
+def renderSettingsWindow(*args):
+    mel.eval('unifiedRenderGlobalsWindow')
+    
+# open the IPR window to see a test render.
+def testRenderWindow(*args):
+    mel.eval('IPRRenderIntoNewWindow')
+       
 # delete Render Window
 def deleteRenderWnd(*args):
     cmds.deleteUI("RenderWindow", window=True)
-
+    
+# delete the Render Window and create the lighting window.  Go Back.
+def goBackRenderWindow(*args):
+    # delete the Render Window.
+    deleteRenderWnd()
+    
+    # create the Lighting Window()
+    windowLighting()
+      
 # create Render Window
 def windowRender(*args):
     # checks to see if window exists. if so, delete it.
@@ -87,10 +110,20 @@ def windowRender(*args):
     
     #___________________________________________________________________________
     
+    #________________________RENDER SETTINGS____________________________________
+    # Open the render settings window to allow the user to chose how they want to render the scene.
+    cmds.button(label='Render Settings', command=renderSettingsWindow, bgc=[0,0.75,0.75])
+    # blank space for ui elements
+    cmds.text(label="")
+    
+    # blank space for ui elements
+    cmds.text(label="")
+    cmds.text(label="")
+    
     #_________________________TEST RENDER_________________________________________
     
     # perform a test render of the current scene
-    cmds.button(label='Test Render', bgc=[1,1,0])
+    cmds.button(label='Test Render',command=testRenderWindow, bgc=[1,1,0])
     # blank space for ui elements
     cmds.text(label="")
     
@@ -101,7 +134,7 @@ def windowRender(*args):
     #____________________________RENDER_____________________________________________
     
     # button to Render the current scene
-    cmds.button(label='RENDER', bgc=[0,1,0])
+    cmds.button(label='RENDER', command=renderGo, bgc=[0,1,0])
     # blank space for ui elements
     cmds.text(label="")
     
@@ -112,7 +145,7 @@ def windowRender(*args):
     cmds.text(label="")
     
     # button go back to previous window
-    cmds.button(label=' Go Back. ', bgc=[1,1,1])
+    cmds.button(label=' Go Back. ', command=goBackRenderWindow, bgc=[1,1,1])
     # blank space for ui elements
     cmds.text(label="") 
     
@@ -237,6 +270,18 @@ def openRenderWnd(*args):
 # delete lighting window
 def deleteLightingWindow(*args):
     cmds.deleteUI("LightingWindow", window=True)
+    
+# delete lighting window then open camera window.  Go Back.
+def goBackLightingWindow(*args):
+    # deletes the lighting window
+    deleteLightingWindow() 
+    
+    # creates the camera window
+    windowCamera()   
+    
+    # deletes camera_02 after it is created due to the camra window being open.
+    cmds.delete('camera_02')
+    
     
 # Create Lighting Setup Window
 def windowLighting(*args):
@@ -511,7 +556,7 @@ def windowLighting(*args):
     cmds.text(label="")
     
     # button go back to previous window
-    cmds.button(label=' Go Back. ', bgc=[1,1,1])
+    cmds.button(label=' Go Back. ',command=goBackLightingWindow, bgc=[1,1,1])
     # blank space for ui elements
     cmds.text(label="") 
     
@@ -644,15 +689,6 @@ def windowCamera():
     cmds.text(label="")
     cmds.text(label="")
     
-    # button go back to previous window
-    cmds.button(label=' Go Back. ', bgc=[1,1,1])
-    # blank space for ui elements
-    cmds.text(label="")
-    
-    # blank space for ui elements
-    cmds.text(label="")
-    cmds.text(label="")
-
     # button to close the current window
     cmds.button(label='Close', command=('cmds.deleteUI(\"' + camWindow + '\", window=True)'), bgc=[1,0,0])
     cmds.setParent('..')
