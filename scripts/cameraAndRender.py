@@ -13,6 +13,7 @@ from math import pow,sqrt
 GLOBAL VARS
 *********************************************************************
 '''
+
 # vars for camera translate sliders
 camTransXSlider = None
 
@@ -70,9 +71,13 @@ dirLColB = 0
 *********************************************************************
 '''
 
-# render based on current render settings
-def renderGo(*args):
+# render based on current render settings a SINGLE frame
+def renderFrame(*args):
     cmds.render()
+    
+# render based on current render settings a SEQUENCE
+def renderSeq(*args):
+    mel.eval('RenderSequence')
 
 # open render settings window.
 def renderSettingsWindow(*args):
@@ -101,7 +106,7 @@ def windowRender(*args):
         cmds.deleteUI("RenderWindow", window=True)     
 
     # create window
-    renderWindow = cmds.window("RenderWindow", title="Render Setup", iconName='Render Setup', bgc=[0.0, 0.1, 0.1], sizeable=False)
+    renderWindow = cmds.window("RenderWindow", title="Render Setup", iconName='Render Setup', bgc=[0.2, 0.2, 0.2], sizeable=False)
     cmds.rowColumnLayout( numberOfColumns=2 )
 
     # blank space for ui elements
@@ -112,7 +117,7 @@ def windowRender(*args):
     
     #________________________RENDER SETTINGS____________________________________
     # Open the render settings window to allow the user to chose how they want to render the scene.
-    cmds.button(label='Render Settings', command=renderSettingsWindow, bgc=[0,0.75,0.75])
+    cmds.button(label='Render Settings', command=renderSettingsWindow, bgc=[0.3,0.3,0.3])
     # blank space for ui elements
     cmds.text(label="")
     
@@ -123,7 +128,7 @@ def windowRender(*args):
     #_________________________TEST RENDER_________________________________________
     
     # perform a test render of the current scene
-    cmds.button(label='Test Render',command=testRenderWindow, bgc=[1,1,0])
+    cmds.button(label='Test Render',command=testRenderWindow, bgc=[0.3,0.3,0.3])
     # blank space for ui elements
     cmds.text(label="")
     
@@ -131,10 +136,17 @@ def windowRender(*args):
     cmds.text(label="")
     cmds.text(label="")
     
-    #____________________________RENDER_____________________________________________
+    #____________________________RENDER SINGLE FRAME_____________________________________________
     
     # button to Render the current scene
-    cmds.button(label='RENDER', command=renderGo, bgc=[0,1,0])
+    cmds.button(label='RENDER FRAME', command=renderFrame, bgc=[0.3,0.3,0.3])
+    # blank space for ui elements
+    cmds.text(label="")
+    
+    #____________________________RENDER SEQUENCE_____________________________________________
+    
+    # button to Render the current scene
+    cmds.button(label='RENDER SEQUENCE', command=renderSeq, bgc=[0.3,0.3,0.3])
     # blank space for ui elements
     cmds.text(label="")
     
@@ -145,7 +157,7 @@ def windowRender(*args):
     cmds.text(label="")
     
     # button go back to previous window
-    cmds.button(label=' Go Back. ', command=goBackRenderWindow, bgc=[1,1,1])
+    cmds.button(label=' Go Back. ', command=goBackRenderWindow, bgc=[0.3,0.3,0.3])
     # blank space for ui elements
     cmds.text(label="") 
     
@@ -156,14 +168,14 @@ def windowRender(*args):
     #_________________________CLOSE BUTTON__________________________________________________
 
     # button to close the current window
-    cmds.button(label='Close', command=deleteRenderWnd, bgc=[1,0,0])
+    cmds.button(label='Close', command=deleteRenderWnd, bgc=[0.3,0.3,0.3])
     cmds.setParent('..')
     
     # Force show window
     cmds.showWindow(renderWindow)
     
     # Force resize the window
-    cmds.window( renderWindow, edit=True, widthHeight=(900, 777), tlc=[0,0] )
+    cmds.window( renderWindow, edit=True, widthHeight=(90, 205), tlc=[0,0] )
 
 # create ambient light
 def createAmbientLight(*args):
@@ -293,7 +305,7 @@ def windowLighting(*args):
     cmds.modelEditor('modelPanel4', e=True, dl='all', sdw=True)       
 
     # create window
-    lightWindow = cmds.window("LightingWindow", title="Lighting Setup", iconName='Lighting Setup', bgc=[0.2, 0.2, 0.0], rtf=True, sizeable=False)
+    lightWindow = cmds.window("LightingWindow", title="Lighting Setup", iconName='Lighting Setup', bgc=[0.2, 0.2, 0.2], rtf=True, sizeable=False)
     cmds.rowColumnLayout( numberOfColumns=2 )
 
     # blank space for ui elements
@@ -545,7 +557,7 @@ def windowLighting(*args):
     #________________________RENDER WINDOW BUTTON__________________________________________
     
     # button to close the current window and open the Render Settings Window.
-    cmds.button(label="Step #3: Rendering", command=openRenderWnd, bgc=[0,1,0])
+    cmds.button(label="Step #3: Rendering", command=openRenderWnd, bgc=[0.3,0.3,0.3])
     # blank space for ui elements
     cmds.text(label="")  
     
@@ -556,7 +568,7 @@ def windowLighting(*args):
     cmds.text(label="")
     
     # button go back to previous window
-    cmds.button(label=' Go Back. ',command=goBackLightingWindow, bgc=[1,1,1])
+    cmds.button(label=' Go Back. ',command=goBackLightingWindow, bgc=[0.3,0.3,0.3])
     # blank space for ui elements
     cmds.text(label="") 
     
@@ -567,14 +579,14 @@ def windowLighting(*args):
     #_________________________CLOSE BUTTON__________________________________________________
 
     # button to close the current window
-    cmds.button(label='Close', command=deleteLightingWindow, bgc=[1,0,0])
+    cmds.button(label='Close', command=deleteLightingWindow, bgc=[0.3,0.3,0.3])
     cmds.setParent('..')
     
     # Force show window
     cmds.showWindow(lightWindow)
     
     # Force resize the window
-    cmds.window( lightWindow, edit=True, widthHeight=(175, 985), tlc=[0,0] )
+    cmds.window( lightWindow, edit=True, widthHeight=(175, 990), tlc=[0,0] )
 
 # Delete Camera Window
 def deleteCameraWnd(*args):
@@ -680,7 +692,7 @@ def windowCamera():
     cmds.text(label="")
 
     # button to move onto Lighting
-    cmds.button(label=' Step #2: Lighting ', command=deleteCameraWnd, bgc=[0,1,0])
+    cmds.button(label=' Step #2: Lighting ', command=deleteCameraWnd, bgc=[0.3,0.3,0.3])
 
     # blank space for ui elements
     cmds.text(label="")
@@ -690,7 +702,7 @@ def windowCamera():
     cmds.text(label="")
     
     # button to close the current window
-    cmds.button(label='Close', command=('cmds.deleteUI(\"' + camWindow + '\", window=True)'), bgc=[1,0,0])
+    cmds.button(label='Close', command=('cmds.deleteUI(\"' + camWindow + '\", window=True)'), bgc=[0.3,0.3,0.3])
     cmds.setParent('..')
     
     #Force show window
@@ -769,30 +781,33 @@ def windowMain(*args):
         cmds.deleteUI("MainWindow", window=True)
     
     # create Main Window
-    mainWindow = cmds.window("MainWindow", title="Main Window", iconName='Main', widthHeight=(500, 100), bgc=[0,0,0], sizeable=True)
-    cmds.rowColumnLayout( numberOfRows=5 )
+    mainWindow = cmds.window("MainWindow", title="Main Window", iconName='Main', widthHeight=(500, 115), bgc=[0.2,0.2,0.2], sizeable=True)
+    cmds.rowColumnLayout( numberOfRows=7 )
                                                
     #text to describe tool
-    cmds.text(label="Auto Render Sprite Sheet Tool", bgc=[0.5,0.5,0.5]) 
+    cmds.text(label="Render Assistant", bgc=[0.5,0.5,0.5]) 
     
     # text body
-    cmds.text(label="This tool will automate setting up a camera and allow user refinemnet of view. Then a lighting setup will be created based on the users selction.  Lastly, Once render is hit, Maya will render the scene then spit out a sprite sheet.", ww=True)
+    cmds.text(label="This tool will automate setting up a camera and allow user refinemnet of view. Then a lighting setup will be created based on the users selction.  Lastly, define render options and render either a single frame or a sequence.", ww=True)
 
     #spacer
     cmds.text(label="")     
      
     # make button to open Camera Setup Window.
-    cmds.button(label='Step #1: Camera Setup', align='center', bgc=[0,1,0], command=deleteMain)
+    cmds.button(label='Step #1: Camera Setup', align='center', bgc=[0.3,0.3,0.3], command=deleteMain)
+    
+    #spacer
+    cmds.text(label="") 
    
     # button to close the current window
-    cmds.button(label='Close', command=deleteMainWindow, bgc=[1,0,0])
+    cmds.button(label='Close', command=deleteMainWindow, bgc=[0.3,0.3,0.3])
     cmds.setParent('..')
     
     #Force show window
     cmds.showWindow(mainWindow)
     
     # Force resize the window
-    cmds.window( mainWindow, edit=True, widthHeight=(240, 150), tlc=[0,0] )
+    cmds.window( mainWindow, edit=True, widthHeight=(240, 200), tlc=[0,0] )
 
 '''
 *********************************************************************
