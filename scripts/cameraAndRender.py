@@ -8,6 +8,12 @@ import maya.mel as mel
 # Import math
 from math import pow,sqrt
 
+# Import os functionality to be able to read & write files and navigate windows structure.
+import os
+
+# Import JSON functionality.
+import json
+
 '''
 *********************************************************************
 GLOBAL VARS
@@ -16,6 +22,8 @@ GLOBAL VARS
 
 # vars for camera translate sliders
 camTransXSlider = None
+camTransYSlider = None
+camTransZSlider = None
 
 # bool for checkbox, camera always look at origin.
 camLookAt = None
@@ -67,9 +75,87 @@ dirLColR = 0
 dirLColG = 0
 dirLColB = 0
 
+#------------------Read/Wrtie Vars -----------------#
+
+path = cmds.internalVar(userWorkspaceDir=True)
+
+cameraSettingsFileName = 'cameraSettings - JSON'
+cameraSettings = {}
+
 '''
 *********************************************************************
 '''
+
+############ -Read & Write Files- ####################
+# Write JSON to file.
+def writeSettings(path, fileName, data):
+    filePathNameWExt = path + fileName + '.json'
+    with open(filePathNameWExt, 'w') as fp:
+        json.dump(data, fp)
+
+# Execute JSON write after populating list with vars of settings.
+def executeWriteCameraSettings(*args):
+    # update all vars associated with Camera
+    camTransXSlider = cmds.intSlider("camTransXSlider", q=True, v=True)
+    camTransYSlider = cmds.intSlider("camTransYSlider", q=True, v=True)
+    camTransZSlider = cmds.intSlider("camTransZSlider", q=True, v=True)
+    camLookAt = cmds.checkBox("cameraLookAtBool", q=True, v=True)
+    camTransX = cmds.intSlider("camTransXSlider", q=True, v=True)
+    camTransY = cmds.intSlider("camTransYSlider", q=True, v=True)
+    camTransZ = cmds.intSlider("camTransZSlider", q=True, v=True)
+    camFOV = cmds.intSlider("camFOVSlider", q=True, v=True)
+
+    # clear list
+    cameraSettings = {}
+
+    # populate cameraSettings {}
+    cameraSettings['camTransXSlider'] = camTransXSlider
+    cameraSettings['camTransYSlider'] = camTransYSlider
+    cameraSettings['camTransZSlider'] = camTransZSlider
+    cameraSettings['camLookAt'] = camLookAt
+    cameraSettings['camTransX'] = camTransX
+    cameraSettings['camTransY'] = camTransY
+    cameraSettings['camTransZ'] = camTransZ
+    cameraSettings['camFOV'] = camFOV
+    writeSettings(path, cameraSettingsFileName, cameraSettings)
+
+# Load settings.
+def loadSettings(path, fileName):
+    with open(path + '/' + fileName + '.json', 'r') as fp:
+        return json.load(fp)
+
+# Load camera settings.
+def loadCameraSettings(*args):
+    #intialize camDic
+    camDic = ''
+
+    #load setting strings into camDic
+    camDic = loadSettings(path, cameraSettingsFileName)
+
+    # populate cameraSettings {}
+    camTransXSlider = camDic.get("camTransXSlider", "")
+    camTransYSlider = camDic.get("camTransYSlider", "")
+    camTransZSlider = camDic.get("camTransZSlider", "")
+    camLookAt = camDic.get("camLookAt", "")
+    camTransX = camDic.get("camTransX", "")
+    camTransY = camDic.get("camTransY", "")
+    camTransZ = camDic.get("camTransZ", "")
+    camFOV = camDic.get("camFOV", "")
+
+    cmds.checkBox("cameraLookAtBool", e=True, v=camLookAt)
+    cmds.text("transXLabel", e=True, label=camTransX)
+    cmds.intSlider("camTransXSlider", e=True, v=camTransXSlider)
+    cmds.text("transYLabel", e=True, label=camTransY)
+    cmds.intSlider("camTransYSlider", e=True, v=camTransYSlider)
+    cmds.text("transZLabel", e=True, label=camTransZ)
+    cmds.intSlider("camTransZSlider", e=True, v=camTransZSlider)
+    cmds.intSlider("camFOVSlider", e=True, v=camFOV)
+
+    # set camera to loaded settings
+    queryFOV()
+    queryCameraSliders()
+
+#####################################################
 
 # render based on current render settings a SINGLE frame
 def renderFrame(*args):
@@ -99,7 +185,7 @@ def goBackRenderWindow(*args):
     # create the Lighting Window()
     windowLighting()
       
-# create Render Window
+# ********************Create Render Window**********************
 def windowRender(*args):
     # checks to see if window exists. if so, delete it.
     if (cmds.window("RenderWindow", q=True, exists=True) == True):
@@ -295,7 +381,7 @@ def goBackLightingWindow(*args):
     cmds.delete('camera_02')
     
     
-# Create Lighting Setup Window
+# ******************Create Lighting Setup Window******************
 def windowLighting(*args):
     # checks to see if window exists. if so, delete it.
     if (cmds.window("LightingWindow", q=True, exists=True) == True):
@@ -554,6 +640,23 @@ def windowLighting(*args):
     cmds.separator(h=40)
     cmds.text(label="")
     
+    #________________________Save & Load Buttons________________________________________
+    # button to move onto Lighting
+    cmds.button(label=' Save Camera Settings ', bgc=[0.3,0.3,0.3])
+    
+    # blank space for ui elements
+    cmds.text(label="")
+    cmds.text(label="")
+    cmds.text(label="")
+    
+    # button to move onto Lighting
+    cmds.button(label=' Load Camera Settings ', bgc=[0.3,0.3,0.3])
+    
+    # blank space for ui elements
+    cmds.text(label="")
+    cmds.text(label="")
+    cmds.text(label="")
+    
     #________________________RENDER WINDOW BUTTON__________________________________________
     
     # button to close the current window and open the Render Settings Window.
@@ -586,14 +689,14 @@ def windowLighting(*args):
     cmds.showWindow(lightWindow)
     
     # Force resize the window
-    cmds.window( lightWindow, edit=True, widthHeight=(175, 990), tlc=[0,0] )
+    cmds.window( lightWindow, edit=True, widthHeight=(175, 1110), tlc=[0,0] )
 
 # Delete Camera Window
 def deleteCameraWnd(*args):
     cmds.deleteUI("CameraWindow", window=True)
     windowLighting()
 
-# Create Camera Setup Window
+# ********************Create Camera Setup Window******************
 def windowCamera():
     # checks to see if window exists. if so, delete it.
     if (cmds.window("CameraWindow", q=True, exists=True) == True):
@@ -690,6 +793,22 @@ def windowCamera():
     # blank space for ui elements
     cmds.text(label="")
     cmds.text(label="")
+    
+    # button to move Save Camera Settings
+    cmds.button(label=' Save Camera Settings ', command=executeWriteCameraSettings, bgc=[0.3,0.3,0.3])
+    
+    # blank space for ui elements
+    cmds.text(label="")
+    cmds.text(label="")
+    cmds.text(label="")
+    
+    # button to move Loaad Camera Settings
+    cmds.button(label=' Load Camera Settings ', command=loadCameraSettings, bgc=[0.3,0.3,0.3])
+    
+    # blank space for ui elements
+    cmds.text(label="")
+    cmds.text(label="")
+    cmds.text(label="")
 
     # button to move onto Lighting
     cmds.button(label=' Step #2: Lighting ', command=deleteCameraWnd, bgc=[0.3,0.3,0.3])
@@ -709,7 +828,7 @@ def windowCamera():
     cmds.showWindow(camWindow)
     
     # Force resize the window
-    cmds.window( camWindow, edit=True, widthHeight=(250, 405), tlc=[0,0] )
+    cmds.window( camWindow, edit=True, widthHeight=(250, 450), tlc=[0,0] )
 
     return camTransXSlider, camTransYSlider, camTransZSlider
     
@@ -751,20 +870,20 @@ def queryCameraSliders(*args):
     camTransY = cmds.intSlider("camTransYSlider", q=True, v=True)
     camTransZ = cmds.intSlider("camTransZSlider", q=True, v=True)
 
-    #Translate camera
+    # Translate camera
     cmds.move(camTransX*0.02, camTransY*0.02, camTransZ*0.02, "camera_01", absolute=True)
     
-    #check bool of always face origin for camera
+    # check bool of always face origin for camera
     camLookAt = cmds.checkBox("cameraLookAtBool", q=True, v=True)
     if camLookAt == True:
         cmds.viewPlace( "camera_01", la=(0, 0, 0) )
-        #updates off of cameraLookAtCB()
+        # updates off of cameraLookAtCB()
         
-    #update text values of sliders
+    # update text values of sliders
     cmds.text("transXLabel", e=True, label=camTransX)
     cmds.text("transYLabel", e=True, label=camTransY)
     cmds.text("transZLabel", e=True, label=camTransZ)
-        
+
 # Delete Main Window for open camera window
 def deleteMain(*args):
     cmds.deleteUI("MainWindow", window=True)
@@ -774,7 +893,7 @@ def deleteMain(*args):
 def deleteMainWindow(*args):
     cmds.deleteUI("MainWindow", window=True)
 
-# Create Main Window
+# ******************Create Main Window********************
 def windowMain(*args):
     #checks to see if window exists. if so, delete it.
     if (cmds.window("MainWindow", q=True, exists=True) == True):
