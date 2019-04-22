@@ -82,16 +82,27 @@ path = cmds.internalVar(userWorkspaceDir=True)
 cameraSettingsFileName = 'cameraSettings - JSON'
 cameraSettings = {}
 
+lightSettingsFileName = 'lightSettings - JSON'
+lightSettings = {}
+
 '''
 *********************************************************************
 '''
 
 ############ -Read & Write Files- ####################
+
 # Write JSON to file.
 def writeSettings(path, fileName, data):
     filePathNameWExt = path + fileName + '.json'
     with open(filePathNameWExt, 'w') as fp:
         json.dump(data, fp)
+
+# Load settings.
+def loadSettings(path, fileName):
+    with open(path + '/' + fileName + '.json', 'r') as fp:
+        return json.load(fp)
+
+# ____________________Camera_______________________________
 
 # Execute JSON write after populating list with vars of settings.
 def executeWriteCameraSettings(*args):
@@ -118,11 +129,6 @@ def executeWriteCameraSettings(*args):
     cameraSettings['camTransZ'] = camTransZ
     cameraSettings['camFOV'] = camFOV
     writeSettings(path, cameraSettingsFileName, cameraSettings)
-
-# Load settings.
-def loadSettings(path, fileName):
-    with open(path + '/' + fileName + '.json', 'r') as fp:
-        return json.load(fp)
 
 # Load camera settings.
 def loadCameraSettings(*args):
@@ -154,6 +160,135 @@ def loadCameraSettings(*args):
     # set camera to loaded settings
     queryFOV()
     queryCameraSliders()
+
+# ________________________Lights________________________________
+
+# Execute JSON write after populating list with vars of settings.
+def executeWriteLightSettings(*args):
+    # update all vars associated with Lighting
+    ambLightBool = cmds.checkBox("ambientLightBool", q=True, v=True)
+    dirLightBool = cmds.checkBox("dirLightBool", q=True, v=True)
+    spotLightBool = cmds.checkBox("spotLightBool", q=True, v=True)
+    spotLightX = cmds.intSlider("spotLightSliderX", q=True, v=True)
+    spotLightY = cmds.intSlider("spotLightSliderY", q=True, v=True)
+    spotLightZ = cmds.intSlider("spotLightSliderZ", q=True, v=True)
+    spotLightInt = cmds.intSlider("spotLightIntSlider", q=True, v=True)
+    spotLightColR = cmds.intSlider("spotLightColRSlider", q=True, v=True)
+    spotLightColG = cmds.intSlider("spotLightColGSlider", q=True, v=True)
+    spotLightColB = cmds.intSlider("spotLightColBSlider", q=True, v=True)
+    spotLightCone = cmds.intSlider("spotLightConeSlider", q=True, v=True)
+    spotLightDropoff = cmds.intSlider("spotLightDropoffSlider", q=True, v=True)
+    ambLInt = cmds.intSlider("ambLightIntSlider", q=True, v=True)
+    ambLColR = cmds.intSlider("ambLightColRSlider", q=True, v=True)
+    ambLColG = cmds.intSlider("ambLightColGSlider", q=True, v=True)
+    ambLColB = cmds.intSlider("ambLightColBSlider", q=True, v=True)
+    dirLRotX = cmds.intSlider("dirLightRotXSlider", q=True, v=True)
+    dirLRotY = cmds.intSlider("dirLightRotYSlider", q=True, v=True)
+    dirLInt = cmds.intSlider("dirLightIntSlider", q=True, v=True)
+    dirLColR = cmds.intSlider("dirLightColRSlider", q=True, v=True)
+    dirLColG = cmds.intSlider("dirLightColGSlider", q=True, v=True)
+    dirLColB = cmds.intSlider("dirLightColBSlider", q=True, v=True)
+
+    # clear list
+    lightSettings = {}
+
+    # populate lightSettings {}
+    lightSettings['ambLightBool'] = ambLightBool
+    lightSettings['dirLightBool'] = dirLightBool
+    lightSettings['spotLightBool'] = spotLightBool
+    lightSettings['spotLightX'] = spotLightX
+    lightSettings['spotLightY'] = spotLightY
+    lightSettings['spotLightZ'] = spotLightZ
+    lightSettings['spotLightInt'] = spotLightInt
+    lightSettings['spotLightColR'] = spotLightColR
+    lightSettings['spotLightColG'] = spotLightColG
+    lightSettings['spotLightColB'] = spotLightColB
+    lightSettings['spotLightCone'] = spotLightCone
+    lightSettings['spotLightDropoff'] = spotLightDropoff
+    lightSettings['ambLInt'] = ambLInt
+    lightSettings['ambLColR'] = ambLColR
+    lightSettings['ambLColG'] = ambLColG
+    lightSettings['ambLColB'] = ambLColB
+    lightSettings['dirLRotX'] = dirLRotX
+    lightSettings['dirLRotY'] = dirLRotY
+    lightSettings['dirLInt'] = dirLInt
+    lightSettings['dirLColR'] = dirLColR
+    lightSettings['dirLColG'] = dirLColG
+    lightSettings['dirLColB'] = dirLColB
+    writeSettings(path, lightSettingsFileName, lightSettings)
+
+# Load camera settings.
+def loadLightSettings(*args):
+    # intialize lightDic
+    lightDic = ''
+
+    # load setting strings into lightDic
+    lightDic = loadSettings(path, lightSettingsFileName)
+
+    # populate lightSettings {}
+    ambLightBool = lightDic.get("ambLightBool")
+    dirLightBool = lightDic.get("dirLightBool")
+    spotLightBool = lightDic.get("spotLightBool")
+    spotLightX = lightDic.get("spotLightX", "")
+    spotLightY = lightDic.get("spotLightY", "")
+    spotLightZ = lightDic.get("spotLightZ", "")
+    spotLightInt = lightDic.get("spotLightInt", "")
+    spotLightColR = lightDic.get("spotLightColR", "")
+    spotLightColG = lightDic.get("spotLightColG", "")
+    spotLightColB = lightDic.get("spotLightColB", "")
+    spotLightCone = lightDic.get("spotLightCone", "")
+    spotLightDropoff = lightDic.get("spotLightDropoff", "")
+    ambLInt = lightDic.get("ambLInt", "")
+    ambLColR = lightDic.get("ambLColR", "")
+    ambLColG = lightDic.get("ambLColG", "")
+    ambLColB = lightDic.get("ambLColB", "")
+    dirLRotX = lightDic.get("dirLRotX", "")
+    dirLRotY = lightDic.get("dirLRotY", "")
+    dirLInt = lightDic.get("dirLInt", "")
+    dirLColR = lightDic.get("dirLColR", "")
+    dirLColG = lightDic.get("dirLColG", "")
+    dirLColB = lightDic.get("dirLColB", "")
+
+    # set light to loaded settings
+    cmds.checkBox("ambientLightBool", e=True, v=ambLightBool)
+    if ambLightBool == True:
+        createAmbientLight()
+    else:
+        delAmbientLight()
+    cmds.checkBox("dirLightBool", e=True, v=dirLightBool)
+    if dirLightBool == True:
+        createDirLight()
+    else:
+        delDirLight()
+    cmds.checkBox("spotLightBool", e=True, v=spotLightBool)
+    if spotLightBool == True:
+        createSpotLight()
+    else:
+        deleteSpotLight()
+    cmds.intSlider("spotLightSliderX", e=True, v=spotLightX)
+    cmds.intSlider("spotLightSliderY", e=True, v=spotLightY)
+    cmds.intSlider("spotLightSliderZ", e=True, v=spotLightZ)
+    cmds.intSlider("spotLightIntSlider", e=True, v=spotLightInt)
+    cmds.intSlider("spotLightColRSlider", e=True, v=spotLightColR)
+    cmds.intSlider("spotLightColGSlider", e=True, v=spotLightColG)
+    cmds.intSlider("spotLightColBSlider", e=True, v=spotLightColB)
+    cmds.intSlider("spotLightConeSlider", e=True, v=spotLightCone)
+    cmds.intSlider("spotLightDropoffSlider", e=True, v=spotLightDropoff)
+    cmds.intSlider("ambLightIntSlider", q=True, v=ambLInt)
+    cmds.intSlider("ambLightColRSlider", e=True, v=ambLColR)
+    cmds.intSlider("ambLightColGSlider", e=True, v=ambLColG)
+    cmds.intSlider("ambLightColBSlider", e=True, v=ambLColB)
+    cmds.intSlider("dirLightRotXSlider", e=True, v=dirLRotX)
+    cmds.intSlider("dirLightRotYSlider", e=True, v=dirLRotY)
+    cmds.intSlider("dirLightIntSlider", e=True, v=dirLInt)
+    cmds.intSlider("dirLightColRSlider", e=True, v=dirLColR)
+    cmds.intSlider("dirLightColGSlider", e=True, v=dirLColG)
+    cmds.intSlider("dirLightColBSlider", e=True, v=dirLColB)
+
+    # set lights to loaded settings
+    queryDirLightSlider()
+    queryAmbLightSliders()
+    querySpotLightSliders()
 
 #####################################################
 
@@ -309,9 +444,9 @@ def deleteSpotLight(*args):
 # Query slider values for spot light location
 def querySpotLightSliders(*args):
     # set var for translates from spotlight Anchor slider translations settings.
-    spotLightX = cmds.intSlider("spotLighSliderX", q=True, v=True)
-    spotLightY = cmds.intSlider("spotLighSliderY", q=True, v=True)
-    spotLightZ = cmds.intSlider("spotLighSliderZ", q=True, v=True)
+    spotLightX = cmds.intSlider("spotLightSliderX", q=True, v=True)
+    spotLightY = cmds.intSlider("spotLightSliderY", q=True, v=True)
+    spotLightZ = cmds.intSlider("spotLightSliderZ", q=True, v=True)
     
     # set vars for spot light intensity
     spotLightInt = cmds.intSlider("spotLightIntSlider", q=True, v=True)
@@ -336,7 +471,7 @@ def querySpotLightSliders(*args):
     # always have spotlight anchor look at center
     cmds.viewPlace('spotlightAnchor_01', la=(0,0,0))
     
-# Quesry slider values for ambient light intensity and color
+# Query slider values for ambient light intensity and color
 def queryAmbLightSliders(*args):
     # set var for values from globals
     ambLInt = cmds.intSlider("ambLightIntSlider", q=True, v=True)
@@ -352,7 +487,7 @@ def queryDirLightSlider(*args):
     # set var for values from globals    
     dirLRotX = cmds.intSlider("dirLightRotXSlider", q=True, v=True)
     dirLRotY = cmds.intSlider("dirLightRotYSlider", q=True, v=True)
-    dirLInt = cmds.intSlider("direLightIntSlider", q=True, v=True)
+    dirLInt = cmds.intSlider("dirLightIntSlider", q=True, v=True)
     dirLColR = cmds.intSlider("dirLightColRSlider", q=True, v=True)
     dirLColG = cmds.intSlider("dirLightColGSlider", q=True, v=True)
     dirLColB = cmds.intSlider("dirLightColBSlider", q=True, v=True)
@@ -379,7 +514,6 @@ def goBackLightingWindow(*args):
     
     # deletes camera_02 after it is created due to the camra window being open.
     cmds.delete('camera_02')
-    
     
 # ******************Create Lighting Setup Window******************
 def windowLighting(*args):
@@ -490,7 +624,7 @@ def windowLighting(*args):
     cmds.text(label="Directional Light Intensity")
     # blank space for ui elements
     cmds.text(label="")
-    dirLightIntSlider = cmds.intSlider("direLightIntSlider", min=1, max=100, value=50, step=1, dc=queryDirLightSlider)
+    dirLightIntSlider = cmds.intSlider("dirLightIntSlider", min=1, max=100, value=50, step=1, dc=queryDirLightSlider)
 
     # blank space for ui elements
     cmds.text(label="")
@@ -542,7 +676,7 @@ def windowLighting(*args):
     cmds.text(label="Spotlight Pos X: ")
     # blank space for ui elements
     cmds.text(label="")
-    camFOVSlider = cmds.intSlider("spotLighSliderX", min=-1000, max=1000, value=0, step=1, dc=querySpotLightSliders)
+    camFOVSlider = cmds.intSlider("spotLightSliderX", min=-1000, max=1000, value=0, step=1, dc=querySpotLightSliders)
 
     # blank space for ui elements
     cmds.text(label="")
@@ -551,7 +685,7 @@ def windowLighting(*args):
     cmds.text(label="Spotlight Pos Y: ")
     # blank space for ui elements
     cmds.text(label="")
-    camFOVSlider = cmds.intSlider("spotLighSliderY", min=-1000, max=1000, value=0, step=1, dc=querySpotLightSliders)
+    camFOVSlider = cmds.intSlider("spotLightSliderY", min=-1000, max=1000, value=0, step=1, dc=querySpotLightSliders)
 
     # blank space for ui elements
     cmds.text(label="")
@@ -560,7 +694,7 @@ def windowLighting(*args):
     cmds.text(label="Spotlight Pos Z: ")
     # blank space for ui elements
     cmds.text(label="")
-    camFOVSlider = cmds.intSlider("spotLighSliderZ", min=-1000, max=1000, value=0, step=1, dc=querySpotLightSliders)
+    camFOVSlider = cmds.intSlider("spotLightSliderZ", min=-1000, max=1000, value=0, step=1, dc=querySpotLightSliders)
     # blank space for ui elements
     cmds.text(label="")
     
@@ -642,7 +776,7 @@ def windowLighting(*args):
     
     #________________________Save & Load Buttons________________________________________
     # button to move onto Lighting
-    cmds.button(label=' Save Camera Settings ', bgc=[0.3,0.3,0.3])
+    cmds.button(label=' Save Light Settings ', command=executeWriteLightSettings, bgc=[0.3,0.3,0.3])
     
     # blank space for ui elements
     cmds.text(label="")
@@ -650,7 +784,7 @@ def windowLighting(*args):
     cmds.text(label="")
     
     # button to move onto Lighting
-    cmds.button(label=' Load Camera Settings ', bgc=[0.3,0.3,0.3])
+    cmds.button(label=' Load Light Settings ', command=loadLightSettings, bgc=[0.3,0.3,0.3])
     
     # blank space for ui elements
     cmds.text(label="")
