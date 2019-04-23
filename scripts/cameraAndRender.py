@@ -219,6 +219,7 @@ def executeWriteLightSettings(*args):
 
 # Load camera settings.
 def loadLightSettings(*args):
+
     # intialize lightDic
     lightDic = ''
 
@@ -274,7 +275,7 @@ def loadLightSettings(*args):
     cmds.intSlider("spotLightColBSlider", e=True, v=spotLightColB)
     cmds.intSlider("spotLightConeSlider", e=True, v=spotLightCone)
     cmds.intSlider("spotLightDropoffSlider", e=True, v=spotLightDropoff)
-    cmds.intSlider("ambLightIntSlider", q=True, v=ambLInt)
+    cmds.intSlider("ambLightIntSlider", e=True, v=ambLInt)
     cmds.intSlider("ambLightColRSlider", e=True, v=ambLColR)
     cmds.intSlider("ambLightColGSlider", e=True, v=ambLColG)
     cmds.intSlider("ambLightColBSlider", e=True, v=ambLColB)
@@ -396,7 +397,7 @@ def windowRender(*args):
     cmds.showWindow(renderWindow)
     
     # Force resize the window
-    cmds.window( renderWindow, edit=True, widthHeight=(90, 205), tlc=[0,0] )
+    cmds.window( renderWindow, edit=True, widthHeight=(115, 215), tlc=[0,0], sizeable=False )
 
 # create ambient light
 def createAmbientLight(*args):
@@ -516,152 +517,146 @@ def goBackLightingWindow(*args):
     cmds.delete('camera_02')
     
 # ******************Create Lighting Setup Window******************
+
 def windowLighting(*args):
     # checks to see if window exists. if so, delete it.
     if (cmds.window("LightingWindow", q=True, exists=True) == True):
         cmds.deleteUI("LightingWindow", window=True)
         
-    # turns on "all lights" and "shadows" for the viewport so that we get an accurate depction of lighting.
+    # turns on "all lights" and "shadows" for the viewport so that we get an accurate depiction of lighting.
     cmds.modelEditor('modelPanel4', e=True, dl='all', sdw=True)       
 
     # create window
-    lightWindow = cmds.window("LightingWindow", title="Lighting Setup", iconName='Lighting Setup', bgc=[0.2, 0.2, 0.2], rtf=True, sizeable=False)
-    cmds.rowColumnLayout( numberOfColumns=2 )
+    lightWindow = cmds.window("LightingWindow", title="Lighting Setup", iconName='Lighting Setup', bgc=[0.2, 0.2, 0.2], sizeable=False)
+    cmds.rowColumnLayout( numberOfColumns=4 )
 
     # blank space for ui elements
     cmds.text(label="")
     cmds.text(label="")
+    cmds.text(label="")
+    cmds.text(label="")
     
-    #__________________________AMBIENT LIGHT_________________________________________________
+    #__________________________AMBIENT LIGHT__(TAB 1)_______________________________________________
 
     # ambient light checkbox
     cmds.text(label="Ambient Light:  ", al="left")
     cmds.checkBox("ambientLightBool", label='', onc=createAmbientLight, ofc=delAmbientLight)
-    
+
     # blank space for ui elements
     cmds.text(label="")
     cmds.text(label="")
-    
+    cmds.text(label="")
+
     # slider to control ambient light intensity
     cmds.text(label="Ambient Light Intensity")
-    # blank space for ui elements
-    cmds.text(label="")
+
     ambLightIntSlider = cmds.intSlider("ambLightIntSlider", min=1, max=20, value=10, step=1, dc=queryAmbLightSliders)
+
     # blank space for ui elements
     cmds.text(label="")
-    
-    # blank space for ui elements
     cmds.text(label="")
-    cmds.text(label="")
-    
+
     # slider to control ambient light color
     cmds.text(label="Ambient Light Color: RED")
-    # blank space for ui elements
-    cmds.text(label="")
+
     ambLightColRSlider = cmds.intSlider("ambLightColRSlider", min=0, max=100, value=100, step=1, dc=queryAmbLightSliders)
+
     # blank space for ui elements
     cmds.text(label="")
-    
-    # blank space for ui elements
     cmds.text(label="")
-    cmds.text(label="")
-    
+
     # slider to control ambient light color
     cmds.text(label="Ambient Light Color: GREEN")
-    # blank space for ui elements
-    cmds.text(label="")
+
     ambLightColGSlider = cmds.intSlider("ambLightColGSlider", min=0, max=100, value=100, step=1, dc=queryAmbLightSliders)
+
     # blank space for ui elements
     cmds.text(label="")
-    
-    # blank space for ui elements
     cmds.text(label="")
-    cmds.text(label="")
-    
+
     # slider to control ambient light color
     cmds.text(label="Ambient Light Color: BLUE")
-    # blank space for ui elements
-    cmds.text(label="")
+
     ambLightColBSlider = cmds.intSlider("ambLightColBSlider", min=0, max=100, value=100, step=1, dc=queryAmbLightSliders)
+
     # blank space for ui elements
     cmds.text(label="")
 
     # blank space for ui elements
     cmds.separator(h=40)
-    cmds.text(label="")
-    
+    cmds.separator(h=40)
+    cmds.separator(h=40)
+    cmds.separator(h=40)
     #______________________________DIRECTIONAL LIGHT_____________________________________________
-    
+
     # directional light
     cmds.text(label="Directional Light:  ", al="left")
     cmds.checkBox("dirLightBool", label='', onc=createDirLight, ofc=delDirLight)
-    
+
     # blank space for ui elements
     cmds.text(label="")
     cmds.text(label="")
-    
+    cmds.text(label="")
+
     # slider to control directional light x rotation
     cmds.text(label="Directional Light Rotation X")
+
+    dirLightRotXSlider = cmds.intSlider("dirLightRotXSlider", min=0, max=359, value=72, step=1, dc=queryDirLightSlider)
+
     # blank space for ui elements
     cmds.text(label="")
-    dirLightRotXSlider = cmds.intSlider("dirLightRotXSlider", min=0, max=359, value=72, step=1, dc=queryDirLightSlider)
-    
-    # blank space for ui elements
-    cmds.text(label="")   
-    
+    cmds.text(label="")
+
     # slider to control direction light y rotation
     cmds.text(label="Directional Light Rotation Y")
-    # blank space for ui elements
-    cmds.text(label="")
+
     dirLightRotYSlider = cmds.intSlider("dirLightRotYSlider", min=0, max=359, value=180, step=1, dc=queryDirLightSlider)
-    
+
     # blank space for ui elements
     cmds.text(label="")
     cmds.text(label="")
-    cmds.text(label="")
-    
+
     # slider to control the directional light intensity
     cmds.text(label="Directional Light Intensity")
-    # blank space for ui elements
-    cmds.text(label="")
+
     dirLightIntSlider = cmds.intSlider("dirLightIntSlider", min=1, max=100, value=50, step=1, dc=queryDirLightSlider)
 
     # blank space for ui elements
     cmds.text(label="")
     cmds.text(label="")
-    cmds.text(label="")
-    
+
     # slider to control the directional light color RED
     cmds.text(label="Directional Light Color RED")
-    # blank space for ui elements
-    cmds.text(label="")
+
     dirLightColRSlider = cmds.intSlider("dirLightColRSlider", min=0, max=100, value=100, step=1, dc=queryDirLightSlider)
-    
+
     # blank space for ui elements
     cmds.text(label="")
-    
-    # slider to control the directiona light color GREEN
+    cmds.text(label="")
+
+    # slider to control the direction light color GREEN
     cmds.text(label="Directional Light Color GREEN")
-    # blank space for ui elements
-    cmds.text(label="")
+
     dirLightColGSlider = cmds.intSlider("dirLightColGSlider", min=0, max=100, value=100, step=1, dc=queryDirLightSlider)
-    
+
     # blank space for ui elements
     cmds.text(label="")
-    
+    cmds.text(label="")
+
     # slider to control the directional light color BLUE
     cmds.text(label="Directional Light Color BLUE")
-    # blank space for ui elements
-    cmds.text(label="")
+
     dirLightColBSlider = cmds.intSlider("dirLightColBSlider", min=0, max=100, value=100, step=1, dc=queryDirLightSlider)
-    
+
     # blank space for ui elements
     cmds.text(label="")
-    
+
     # blank space for ui elements
     cmds.separator(h=40)
-    cmds.text(label="")
-    
+    cmds.separator(h=40)
+    cmds.separator(h=40)
+    cmds.separator(h=40)
+
     #_____________________________SPOT LIGHT______________________________________________
 
     # spotlight checkbox
@@ -671,149 +666,148 @@ def windowLighting(*args):
     # blank space for ui elements
     cmds.text(label="")
     cmds.text(label="")
+    cmds.text(label="")
 
     # slider for Spot Light X
     cmds.text(label="Spotlight Pos X: ")
-    # blank space for ui elements
-    cmds.text(label="")
+
     camFOVSlider = cmds.intSlider("spotLightSliderX", min=-1000, max=1000, value=0, step=1, dc=querySpotLightSliders)
 
     # blank space for ui elements
     cmds.text(label="")
+    cmds.text(label="")
 
     # slider for Spot Light Y
     cmds.text(label="Spotlight Pos Y: ")
-    # blank space for ui elements
-    cmds.text(label="")
+
     camFOVSlider = cmds.intSlider("spotLightSliderY", min=-1000, max=1000, value=0, step=1, dc=querySpotLightSliders)
 
     # blank space for ui elements
     cmds.text(label="")
+    cmds.text(label="")
 
     # slider for Spot Light Z
     cmds.text(label="Spotlight Pos Z: ")
-    # blank space for ui elements
-    cmds.text(label="")
+
     camFOVSlider = cmds.intSlider("spotLightSliderZ", min=-1000, max=1000, value=0, step=1, dc=querySpotLightSliders)
+
     # blank space for ui elements
     cmds.text(label="")
-    
-    # blank space for ui elements
     cmds.text(label="")
-    cmds.text(label="")
-    
+
     # slider to control the spot light intensity
     cmds.text(label='Spotlight Intensity')
-    # blank space for ui elements
-    cmds.text(label="")
+
     spotLightIntSlider = cmds.intSlider("spotLightIntSlider", min=1, max=100, value=50, step=1, dc=querySpotLightSliders)
+
     # blank space for ui elements
     cmds.text(label="")
-    
-    # blank space for ui elements
     cmds.text(label="")
-    cmds.text(label="")
-    
+
     # slider to control the spot light color RED
     cmds.text(label="Spotlight Color RED")
-    # blank space for ui elements
-    cmds.text(label="")
+
     spotLightColRSlider = cmds.intSlider("spotLightColRSlider", min=0, max=100, value=100, step=1, dc=querySpotLightSliders)
+
     # blank space for ui elements
     cmds.text(label="")
-    
-    # blank space for ui elements
     cmds.text(label="")
-    cmds.text(label="")
-    
+
     # slider to control the spot light color GREEN
     cmds.text(label="Spotlight Color GREEN")
-    # blank space for ui elements
-    cmds.text(label="")
+
     spotLightColGSlider = cmds.intSlider("spotLightColGSlider", min=0, max=100, value=100, step=1, dc=querySpotLightSliders)
+
     # blank space for ui elements
     cmds.text(label="")
-    
-    # blank space for ui elements
     cmds.text(label="")
-    cmds.text(label="")
-    
+
     # slider to control the spot light color BLUE
     cmds.text(label="Spotlight Color BLUE")
-    # blank space for ui elements
-    cmds.text(label="")
+
     spotLightColBSlider = cmds.intSlider("spotLightColBSlider", min=0, max=100, value=100, step=1, dc=querySpotLightSliders)
+
     # blank space for ui elements
     cmds.text(label="")
-    
-    # blank space for ui elements
     cmds.text(label="")
-    cmds.text(label="")
-    
+
     # slider to control the spot light cone angle
     cmds.text(label="Spotlight Cone Angle")
-    # blank space for ui elements
-    cmds.text(label="")
+
     spotLightConeSlider = cmds.intSlider("spotLightConeSlider", min=0, max=100, value=100, step=1, dc=querySpotLightSliders)
+
     # blank space for ui elements
     cmds.text(label="")
-    
-    # blank space for ui elements
     cmds.text(label="")
-    cmds.text(label="")
-    
+
     # slider to control the spot light dropoff 
     cmds.text(label="Spotlight Dropoff")
+
+    spotLightDropoffSlider = cmds.intSlider("spotLightDropoffSlider", min=0, max=256, value=0, step=1, dc=querySpotLightSliders)
+
     # blank space for ui elements
     cmds.text(label="")
-    spotLightDropoffSlider = cmds.intSlider("spotLightDropoffSlider", min=0, max=256, value=0, step=1, dc=querySpotLightSliders)
-    # blank space for ui elements
-    cmds.text(label="")   
-    
+
     # blank space for ui elements
     cmds.separator(h=40)
-    cmds.text(label="")
-    
+    cmds.separator(h=40)
+    cmds.separator(h=40)
+    cmds.separator(h=40)
+
     #________________________Save & Load Buttons________________________________________
-    # button to move onto Lighting
+
+    # blank space for ui elements
+    cmds.text(label="")
+
+    # button to save Lighting settings
     cmds.button(label=' Save Light Settings ', command=executeWriteLightSettings, bgc=[0.3,0.3,0.3])
-    
+
     # blank space for ui elements
     cmds.text(label="")
     cmds.text(label="")
     cmds.text(label="")
-    
-    # button to move onto Lighting
+
+    # button to load the Lighting settings
     cmds.button(label=' Load Light Settings ', command=loadLightSettings, bgc=[0.3,0.3,0.3])
-    
+
+    #________________________RENDER WINDOW BUTTON__________________________________________
+
     # blank space for ui elements
     cmds.text(label="")
     cmds.text(label="")
     cmds.text(label="")
-    
-    #________________________RENDER WINDOW BUTTON__________________________________________
-    
+    cmds.text(label="")
+    cmds.text(label="")
+    cmds.text(label="")
+    cmds.text(label="")
+
     # button to close the current window and open the Render Settings Window.
     cmds.button(label="Step #3: Rendering", command=openRenderWnd, bgc=[0.3,0.3,0.3])
-    # blank space for ui elements
-    cmds.text(label="")  
-    
+
     #_______________________GO BACK BUTTON________________________________________________
-    
+
     # blank space for ui elements
     cmds.text(label="")
     cmds.text(label="")
-    
+    cmds.text(label="")
+    cmds.text(label="")
+    cmds.text(label="")
+    cmds.text(label="")
+    cmds.text(label="")
+
     # button go back to previous window
     cmds.button(label=' Go Back. ',command=goBackLightingWindow, bgc=[0.3,0.3,0.3])
-    # blank space for ui elements
-    cmds.text(label="") 
-    
-    # blank space for ui elements
-    cmds.text(label="")
-    cmds.text(label="")
-    
+
     #_________________________CLOSE BUTTON__________________________________________________
+
+    # blank space for ui elements
+    cmds.text(label="")
+    cmds.text(label="")
+    cmds.text(label="")
+    cmds.text(label="")
+    cmds.text(label="")
+    cmds.text(label="")
+    cmds.text(label="")
 
     # button to close the current window
     cmds.button(label='Close', command=deleteLightingWindow, bgc=[0.3,0.3,0.3])
@@ -823,7 +817,7 @@ def windowLighting(*args):
     cmds.showWindow(lightWindow)
     
     # Force resize the window
-    cmds.window( lightWindow, edit=True, widthHeight=(175, 1110), tlc=[0,0] )
+    cmds.window( lightWindow, edit=True, rtf=True, wh= [350,625], tlc=[0,0], sizeable=False )
 
 # Delete Camera Window
 def deleteCameraWnd(*args):
@@ -837,7 +831,7 @@ def windowCamera():
         cmds.deleteUI("CameraWindow", window=True)
         
     # make window
-    camWindow =cmds.window("CameraWindow", title="Camera Setup", iconName='Camera Setup', bgc=[0.2, 0.2, 0.2], sizeable=True)
+    camWindow =cmds.window("CameraWindow", title="Camera Setup", iconName='Camera Setup', bgc=[0.2, 0.2, 0.2], sizeable=False)
     #cmds.columnLayout(adjustableColumn=True)
     cmds.rowColumnLayout( numberOfColumns=2 )
     
@@ -933,10 +927,8 @@ def windowCamera():
     
     # blank space for ui elements
     cmds.text(label="")
-    cmds.text(label="")
-    cmds.text(label="")
     
-    # button to move Loaad Camera Settings
+    # button to move Load Camera Settings
     cmds.button(label=' Load Camera Settings ', command=loadCameraSettings, bgc=[0.3,0.3,0.3])
     
     # blank space for ui elements
@@ -962,7 +954,7 @@ def windowCamera():
     cmds.showWindow(camWindow)
     
     # Force resize the window
-    cmds.window( camWindow, edit=True, widthHeight=(250, 450), tlc=[0,0] )
+    cmds.window( camWindow, edit=True, widthHeight=(250, 450), rtf=True,  tlc=[0,0] )
 
     return camTransXSlider, camTransYSlider, camTransZSlider
     
@@ -1034,7 +1026,7 @@ def windowMain(*args):
         cmds.deleteUI("MainWindow", window=True)
     
     # create Main Window
-    mainWindow = cmds.window("MainWindow", title="Main Window", iconName='Main', widthHeight=(500, 115), bgc=[0.2,0.2,0.2], sizeable=True)
+    mainWindow = cmds.window("MainWindow", title="Main Window", iconName='Main', widthHeight=(500, 115), bgc=[0.2,0.2,0.2] )
     cmds.rowColumnLayout( numberOfRows=7 )
                                                
     #text to describe tool
@@ -1060,7 +1052,7 @@ def windowMain(*args):
     cmds.showWindow(mainWindow)
     
     # Force resize the window
-    cmds.window( mainWindow, edit=True, widthHeight=(240, 200), tlc=[0,0] )
+    cmds.window( mainWindow, edit=True, widthHeight=(240, 175), tlc=[0,0], sizeable=False )
 
 '''
 *********************************************************************
