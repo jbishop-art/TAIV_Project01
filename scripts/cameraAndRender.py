@@ -1,3 +1,18 @@
+#||||||||||||||||||||||||||||||||||
+'''
+Render assistant tool for Maya.
+--allows the user to set up a camera and lighting easily.
+--Save/Load settings for camera and lights.
+--Easy to use buttons to drive windows for render settings and test render window.
+--Render a single frame or a sequence.
+
+Future Work:
+--Sprite sheet automation output.
+--Add more lighting options and more light functionality.
+--Import/Export camera and lights as FBX.
+
+'''
+
 # Import maya.cmds and abrevaite them to "cmds".
 import maya.cmds as cmds
 from functools import partial
