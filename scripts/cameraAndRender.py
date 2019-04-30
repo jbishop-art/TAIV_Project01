@@ -175,6 +175,7 @@ def loadCameraSettings(*args):
     # set camera to loaded settings
     queryFOV()
     queryCameraSliders()
+    cmds.refresh()
 
 # ________________________Lights________________________________
 
@@ -232,8 +233,21 @@ def executeWriteLightSettings(*args):
     lightSettings['dirLColB'] = dirLColB
     writeSettings(path, lightSettingsFileName, lightSettings)
 
-# Load camera settings.
+# Load Lighting settings.
 def loadLightSettings(*args):
+
+    # if the 'Ambient_Light' already exists, delete it.
+    if (cmds.objExists('Ambient_Light') == True):
+        cmds.delete('Ambient_Light')
+    # if the 'Directional_Light' already exists, delete it.
+    if (cmds.objExists('Directional_Light') == True):
+        cmds.delete('Directional_Light')
+    # if the 'spotlightAnchor_01' already exists, delete it.
+    if (cmds.objExists('spotlightAnchor_01') == True):
+        cmds.delete('spotlightAnchor_01')
+    # if the 'spotlight_01' already exists, delete it.
+    if (cmds.objExists('spotlight_01') == True):
+        cmds.delete('spotlight_01')
 
     # intialize lightDic
     lightDic = ''
@@ -281,7 +295,9 @@ def loadLightSettings(*args):
         createSpotLight()
     else:
         deleteSpotLight()
+
     cmds.intSlider("spotLightSliderX", e=True, v=spotLightX)
+    print (cmds.intSlider("spotLightSliderX", q=True, v=True))
     cmds.intSlider("spotLightSliderY", e=True, v=spotLightY)
     cmds.intSlider("spotLightSliderZ", e=True, v=spotLightZ)
     cmds.intSlider("spotLightIntSlider", e=True, v=spotLightInt)
@@ -301,10 +317,13 @@ def loadLightSettings(*args):
     cmds.intSlider("dirLightColGSlider", e=True, v=dirLColG)
     cmds.intSlider("dirLightColBSlider", e=True, v=dirLColB)
 
+    cmds.refresh(force=True)
+
     # set lights to loaded settings
     queryDirLightSlider()
     queryAmbLightSliders()
     querySpotLightSliders()
+    cmds.refresh()
 
 #####################################################
 
@@ -424,7 +443,9 @@ def createAmbientLight(*args):
     
 # delete ambient light
 def delAmbientLight(*args):
-    cmds.delete('Ambient_Light')
+    # if the 'Ambient_Light' already exists, delete it.
+    if (cmds.objExists('Ambient_Light') == True):
+        cmds.delete('Ambient_Light')
     
 # create directional light
 def createDirLight(*args):
@@ -432,7 +453,9 @@ def createDirLight(*args):
     
 # delete directional light
 def delDirLight(*args):
-    cmds.delete('Directional_Light')       
+    # if the 'Directional_Light' already exists, delete it.
+    if (cmds.objExists('Directional_Light') == True):
+        cmds.delete('Directional_Light')
     
 # create spot light
 def createSpotLight(*args):
@@ -453,9 +476,12 @@ def createSpotLight(*args):
     
 # delete spot light
 def deleteSpotLight(*args):
-    # Delete directional Light
-    cmds.delete('spotlight_01')
-    cmds.delete('spotlightAnchor_01')
+    # if the 'spotlightAnchor_01' already exists, delete it.
+    if (cmds.objExists('spotlightAnchor_01') == True):
+        cmds.delete('spotlightAnchor_01')
+    # if the 'spotlight_01' already exists, delete it.
+    if (cmds.objExists('spotlight_01') == True):
+        cmds.delete('spotlight_01')
         
 # Query slider values for spot light location
 def querySpotLightSliders(*args):
@@ -496,8 +522,10 @@ def queryAmbLightSliders(*args):
     ambLColB = cmds.intSlider("ambLightColBSlider", q=True, v=True)
     
     # change color of ambient light base on slider values
-    cmds.ambientLight('Ambient_Light', e=True, i=(ambLInt * 0.1), rgb=[ambLColR *0.01, ambLColG *0.01, ambLColB *0.01])
-    
+    # if the 'Ambient_Light' already exists, delete it.
+    if (cmds.objExists('Ambient_Light') == True):
+        cmds.ambientLight('Ambient_Light', e=True, i=(ambLInt * 0.1), rgb=[ambLColR * 0.01, ambLColG * 0.01, ambLColB * 0.01])
+
 # Query slider values for directional light rotation, intensity and color
 def queryDirLightSlider(*args):
     # set var for values from globals    
@@ -509,7 +537,9 @@ def queryDirLightSlider(*args):
     dirLColB = cmds.intSlider("dirLightColBSlider", q=True, v=True)
     
     # change rotations based on slider values
-    cmds.directionalLight('Directional_Light', e=True, rot=[dirLRotX, dirLRotY, 0], rgb=[dirLColR *0.01, dirLColG *0.01, dirLColB *0.01], i= dirLInt * 0.1)
+    # if the 'Directional_Light' already exists, delete it.
+    if (cmds.objExists('Directional_Light') == True):
+        cmds.directionalLight('Directional_Light', e=True, rot=[dirLRotX, dirLRotY, 0], rgb=[dirLColR * 0.01, dirLColG * 0.01, dirLColB * 0.01], i=dirLInt * 0.1)
 
 # Delete lighting Window then open render window
 def openRenderWnd(*args):
@@ -1028,6 +1058,11 @@ def queryCameraSliders(*args):
 # Delete Main Window for open camera window
 def deleteMain(*args):
     cmds.deleteUI("MainWindow", window=True)
+
+    # if 'camera_01' already exists, get rid of it.
+    if (cmds.objExists('camera_01') == True):
+        cmds.delete('camera_01')
+
     windowCamera()
     
 # Delete Main Window for close
@@ -1036,10 +1071,6 @@ def deleteMainWindow(*args):
 
 # ******************Create Main Window********************
 def windowMain(*args):
-    #checks to see if window exists. if so, delete it.
-    if (cmds.window("MainWindow", q=True, exists=True) == True):
-        cmds.deleteUI("MainWindow", window=True)
-    
     # create Main Window
     mainWindow = cmds.window("MainWindow", title="Main Window", iconName='Main', widthHeight=(500, 115), bgc=[0.2,0.2,0.2] )
     cmds.rowColumnLayout( numberOfRows=7 )
